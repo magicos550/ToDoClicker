@@ -1,0 +1,17 @@
+export const colorsList = {
+    pink: '#F48FB1',
+    red: '#D32F2F',
+    deep_orange2: '#FF3D00',
+    orange2: '#FF6D00',
+    amber: '#FFCA26',
+    lime2: '#C6FF00',
+    green: '#388E3C',
+    green2: '#1B5E20',
+    cyan: '#00E5FF',
+    blue: '#039BE5',
+    indigo: '#303F9F',
+    purple: '#D500F9',
+    purple2: '#4A148C',
+    grey: '#607D8B',
+    grey2: '#9E9E9E',
+}
