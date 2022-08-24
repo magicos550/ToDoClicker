@@ -18,7 +18,7 @@ const Card = (props: iCardConfig) => {
             borderWidth: 1,
             borderColor: props.color,
             padding: 20,
-            borderRadius: 20,
+            borderRadius: 10,
             backgroundColor: 'rgba(255,255,255,.1)',
             position: "relative",
             marginBottom: 20
@@ -48,7 +48,7 @@ const Card = (props: iCardConfig) => {
         },
         cardButton: {
             backgroundColor: MD3Colors.neutral40,
-            borderRadius: 5,
+            borderRadius: 10,
             width: 80,
             alignSelf: "flex-end",
         },
@@ -84,7 +84,7 @@ const Card = (props: iCardConfig) => {
                         tintColor={props.color}
                         style={{marginRight: 0, paddingRight: 0}}
                         onAnimationComplete={() => console.log('onAnimationComplete')}
-                        backgroundColor="#3d5875">
+                        backgroundColor={props.color + '33'}>
                         {fill => <Text style={styles.circleText}>{parseInt(fill.toString())}%</Text>}
                     </AnimatedCircularProgress>
                 </View>
