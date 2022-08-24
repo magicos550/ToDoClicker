@@ -1,11 +1,21 @@
 import * as React from 'react';
-import {StatusBar, StyleSheet, View} from "react-native";
+import {ScrollView, StatusBar, StyleSheet, View} from "react-native";
 import {IconButton, MD3Colors, Text, TextInput} from 'react-native-paper';
 import {colorsList} from "../../../colorsConfig";
 import ColorPicker from "./ColorPicker";
 
+interface iToDo {
+    title: string | null,
+    count: number | null,
+    step: number | null
+}
+
 const AddForm = (props) => {
-    const [text, setText] = React.useState("");
+    const [info, setInfo] = React.useState<iToDo>({
+        title: null,
+        count: null,
+        step: null
+    });
 
 
     const styles = StyleSheet.create({
@@ -27,50 +37,34 @@ const AddForm = (props) => {
     });
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <IconButton
-                    mode='contained'
-                    containerColor={MD3Colors.neutral20}
-                    icon="close"
-                    iconColor={MD3Colors.error50}
-                    size={30}
-                    onPress={() => console.log('Pressed')}
-                />
-                <Text style={{fontSize: 20}}>Добавить новую цель</Text>
-                <IconButton
-                    mode='contained'
-                    containerColor={MD3Colors.neutral20}
-                    icon="plus"
-                    iconColor={MD3Colors.tertiary100}
-                    size={30}
-                    onPress={() => console.log('Pressed')}
-                />
-            </View>
+        <ScrollView style={styles.container}>
+
             <View style={styles.container}>
                 <TextInput
-                    label="Email"
-                    value={text}
-                    onChangeText={text => setText(text)}
+                    label="Название цели"
+                    value={info.title}
+                    onChangeText={val => setInfo({...info, title: val})}
                 />
                 <View style={styles.header}>
                     <TextInput
                         style={styles.textInput}
                         label="Количество"
-                        value={text}
-                        onChangeText={text => setText(text)}
+                        keyboardType={'numeric'}
+                        value={info.count ? info.count.toString() : ''}
+                        onChangeText={val => setInfo({...info, count: parseInt(val.replace(/[^0-9]/g, ''))})}
                     />
                     <TextInput
                         style={styles.textInput}
                         label="Шаг"
-                        value={text}
-                        onChangeText={text => setText(text)}
+                        keyboardType={'numeric'}
+                        value={info.step ? info.step.toString() : ''}
+                        onChangeText={val => setInfo({...info, step: parseInt(val.replace(/[^0-9]/g, ''))})}
                     />
                 </View>
             </View>
 
             <ColorPicker colors={colorsList} />
-        </View>
+        </ScrollView>
     );
 };
 

@@ -1,7 +1,7 @@
 import React from "react";
 import {StyleSheet, StatusBar} from 'react-native';
 import {configureFonts, MD3DarkTheme, Provider as PaperProvider} from "react-native-paper";
-import BottomNav from "./components/BottomNav";
+import BottomNav from "./components/Content/parts/BottomNav";
 import Content from "./components/Content/Content";
 import {SafeAreaView} from "react-native-safe-area-context";
 

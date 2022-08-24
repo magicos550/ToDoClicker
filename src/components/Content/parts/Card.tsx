@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
-import {Button, Text} from 'react-native-paper';
+import {Button, MD3Colors, Text} from 'react-native-paper';
 import {StyleSheet, View} from "react-native";
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import {green} from "react-native-reanimated/lib/types/lib";
 
 interface iCardConfig {
     color: string,
@@ -11,9 +12,10 @@ interface iCardConfig {
 }
 
 const Card = (props: iCardConfig) => {
+
     const styles = StyleSheet.create({
         card: {
-            borderWidth: 2,
+            borderWidth: 1,
             borderColor: props.color,
             padding: 20,
             borderRadius: 20,
@@ -29,19 +31,39 @@ const Card = (props: iCardConfig) => {
             fontWeight: 'bold'
         },
         cardInner: {
+            height: 120,
             marginTop: 20,
             display: "flex",
             flexDirection: "row",
-            alignItems: "center"
+            alignItems: "flex-start"
+        },
+        cardTitle: {
+            fontSize: 20,
+            fontWeight: 'bold'
         },
         cardInfo: {
-            marginLeft: 20
+            height: '100%',
+            justifyContent: "space-between",
+            flexGrow: 1,
         },
         cardButton: {
-            marginTop: 40
+            backgroundColor: MD3Colors.neutral40,
+            borderRadius: 5,
+            width: 80,
+            alignSelf: "flex-end",
         },
         cardProgress: {
-            flexGrow: 1
+            width: '50%',
+        },
+        textWrapper: {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexDirection: "row"
+        },
+        text: {
+            fontSize: 14,
+            lineHeight: 14
         }
     })
 
@@ -51,7 +73,7 @@ const Card = (props: iCardConfig) => {
 
     return (
         <View style={styles.card}>
-            <Text style={{fontSize: 20}}>{props.title}</Text>
+            <Text style={styles.cardTitle}>{props.title}</Text>
             <View style={styles.cardInner}>
                 <View style={styles.cardProgress}>
                     <AnimatedCircularProgress
@@ -60,15 +82,25 @@ const Card = (props: iCardConfig) => {
                         fill={percent < 100 ? percent : 100}
                         rotation={0}
                         tintColor={props.color}
+                        style={{marginRight: 0, paddingRight: 0}}
                         onAnimationComplete={() => console.log('onAnimationComplete')}
                         backgroundColor="#3d5875">
                         {fill => <Text style={styles.circleText}>{parseInt(fill.toString())}%</Text>}
                     </AnimatedCircularProgress>
                 </View>
                 <View style={styles.cardInfo}>
-                    <Text style={{fontSize: 14}}>Счетчик: {props.target >= score ? score + '/' + props.target : props.target}</Text>
-                    <Text>Осталось: {props.target > score ? props.target - score : 'OK'}</Text>
-                    <Button mode="outlined" color={props.color} onPress={() => setScore(score += props.step)} style={styles.cardButton}>
+                    <View>
+                        <View style={styles.textWrapper}>
+                            <Text style={styles.text}>Счетчик:</Text>
+                            <Text style={styles.text}>{props.target >= score ? score + '/' + props.target : props.target}</Text>
+                        </View>
+                        <View style={[styles.textWrapper, {marginTop: 10}]}>
+                            <Text style={styles.text}>Осталось:</Text>
+                            <Text style={styles.text}>{props.target > score ? props.target - score : 'OK'}</Text>
+                        </View>
+                    </View>
+
+                    <Button mode="contained" labelStyle={{fontSize: 16, fontWeight: 'bold'}} textColor={MD3Colors.neutral100} onPress={() => setScore(score += props.step)} style={styles.cardButton}>
                         + {props.step}
                     </Button>
                 </View>
