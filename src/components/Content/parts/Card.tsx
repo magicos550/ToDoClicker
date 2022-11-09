@@ -2,9 +2,12 @@ import React, {useState} from 'react';
 import {Button, MD3Colors, Text} from 'react-native-paper';
 import {StyleSheet, View} from "react-native";
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import {green} from "react-native-reanimated/lib/types/lib";
+import {useDispatch} from "react-redux";
+import {db} from "../../../db";
+import {removeCard} from "../../../store/slices/cardsSlice";
 
 interface iCardConfig {
+    id: number
     color: string,
     title: string,
     step: number,
@@ -12,26 +15,27 @@ interface iCardConfig {
 }
 
 const Card = (props: iCardConfig) => {
+    const dispatch = useDispatch();
 
     const styles = StyleSheet.create({
         card: {
             borderWidth: 1,
             borderColor: props.color,
-            padding: 20,
+            padding: 15,
             borderRadius: 10,
             backgroundColor: 'rgba(255,255,255,.1)',
             position: "relative",
-            marginBottom: 20
+            marginBottom: 15
         },
         absolute: {
             position: 'absolute',
         },
         circleText: {
-            fontSize: 24,
+            fontSize: 26,
             fontWeight: 'bold'
         },
         cardInner: {
-            height: 120,
+            height: 130,
             marginTop: 20,
             display: "flex",
             flexDirection: "row",
@@ -45,11 +49,12 @@ const Card = (props: iCardConfig) => {
             height: '100%',
             justifyContent: "space-between",
             flexGrow: 1,
+            display: "flex"
         },
         cardButton: {
             backgroundColor: MD3Colors.neutral40,
             borderRadius: 10,
-            width: 80,
+            width: '100%',
             alignSelf: "flex-end",
         },
         cardProgress: {
@@ -62,8 +67,7 @@ const Card = (props: iCardConfig) => {
             flexDirection: "row"
         },
         text: {
-            fontSize: 14,
-            lineHeight: 14
+            fontSize: 17,
         }
     })
 
@@ -71,19 +75,32 @@ const Card = (props: iCardConfig) => {
 
     const percent = (score / props.target) * 100;
 
+    const complete = () => {
+        db.transaction((tx) => {
+            tx.executeSql(
+                `delete from todos where ID=${props.id}`,
+                null,
+                (transaction, result) => {
+                    dispatch(removeCard(props.id))
+                }
+            )
+        });
+    }
+
+
     return (
         <View style={styles.card}>
             <Text style={styles.cardTitle}>{props.title}</Text>
             <View style={styles.cardInner}>
                 <View style={styles.cardProgress}>
                     <AnimatedCircularProgress
-                        size={120}
-                        width={15}
+                        size={130}
+                        width={17}
                         fill={percent < 100 ? percent : 100}
                         rotation={0}
                         tintColor={props.color}
                         style={{marginRight: 0, paddingRight: 0}}
-                        onAnimationComplete={() => console.log('onAnimationComplete')}
+                        onAnimationComplete={() => score >= props.target ? complete() : false}
                         backgroundColor={props.color + '33'}>
                         {fill => <Text style={styles.circleText}>{parseInt(fill.toString())}%</Text>}
                     </AnimatedCircularProgress>

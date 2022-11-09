@@ -1,12 +1,15 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {StyleSheet, StatusBar} from 'react-native';
 import {useTheme} from "react-native-paper";
-/*import {StatusBar} from "expo-status-bar";*/
 import {SafeAreaView, SafeAreaProvider} from "react-native-safe-area-context";
 import Index from "./src/Index";
 import {GestureHandlerRootView} from "react-native-gesture-handler";
+import {createTable} from './src/db';
 
 const App: React.FC = () => {
+    useEffect(() => {
+        createTable();
+    }, [])
     const {colors} = useTheme();
 
     return (

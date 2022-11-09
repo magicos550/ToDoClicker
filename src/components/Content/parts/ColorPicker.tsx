@@ -1,16 +1,16 @@
 import * as React from "react";
 import {StyleSheet, View} from "react-native";
-import {IconButton, MD3Colors} from "react-native-paper";
-import {useState} from "react";
+import {IconButton, MD3Colors, Text} from "react-native-paper";
 
 interface iColorPickerProps {
+    currentColor: string,
     colors: {
        [key: string]: string
-    }
+    },
+    updateColor: (color: string) => void
 }
 
 const ColorPicker = (props: iColorPickerProps) => {
-    const [color, setColor] = useState('');
 
     const styles = StyleSheet.create({
         colorPickerWrapper: {
@@ -21,31 +21,48 @@ const ColorPicker = (props: iColorPickerProps) => {
             width: '100%',
             flexDirection: "row",
             padding: 5,
-            marginTop: 10
+            marginTop: 10,
+            borderColor: 'transparent',
+            borderWidth: 1,
+            borderRadius: 5,
+            backgroundColor: '#323232'
         },
         colorPickerItem: {
-            width: 62,
-            height: 62,
-            borderRadius: 10,
-            marginTop: 5,
+            flexGrow: 1,
+            width: 55,
+            height: 55,
+            borderRadius: 5,
+            marginHorizontal: 5,
+            marginVertical: 5
         },
         check: {
             alignSelf: "center"
+        },
+        colorPickerBox: {
+            padding: 5,
+        },
+        label: {
+            fontSize: 18
         }
     });
 
     return (
-        <View style={styles.colorPickerWrapper}>
-            {Object.keys(props.colors).map((item) => (
-                <IconButton
-                    key={item}
-                    icon={color === item ? 'check' : ''}
-                    iconColor={MD3Colors.primary0}
-                    size={40}
-                    style={[styles.colorPickerItem, {backgroundColor: props.colors[item]}]}
-                    onPress={() => setColor(item)}
-                />
-            ))}
+        <View style={styles.colorPickerBox}>
+            <Text style={styles.label}>Выберите цвет</Text>
+            <View style={styles.colorPickerWrapper}>
+                {Object.keys(props.colors).map((item) => (
+                    <IconButton
+                        key={item}
+                        icon={props.currentColor === props.colors[item] ? 'check' : ''}
+                        iconColor={MD3Colors.primary0}
+                        size={40}
+                        style={[styles.colorPickerItem, {backgroundColor: props.colors[item]}]}
+                        onPress={() => {
+                            props.updateColor(props.colors[item]);
+                        }}
+                    />
+                ))}
+            </View>
         </View>
     )
 }
