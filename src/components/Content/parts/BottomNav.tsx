@@ -7,7 +7,7 @@ import AddForm from "./AddForm";
 
 const BottomNav = () => {
     const bottomSheetRef = useRef<BottomSheet>(null);
-    const snapPoints = useMemo(() => [450], []);
+    const snapPoints = useMemo(() => ['100%'], []);
 
     const handleSheetChanges = useCallback((index: number) => {
         Keyboard.dismiss();
@@ -31,27 +31,9 @@ const BottomNav = () => {
                   onChange={handleSheetChanges}
                   enablePanDownToClose={true}
                   enableHandlePanningGesture={false}
-                  backgroundStyle={{backgroundColor: colors.surfaceVariant}}
+                  backgroundStyle={{backgroundColor: '#282828'}}
                 >
-                    <View style={styles.header}>
-                        <IconButton
-                          mode='contained'
-                          containerColor={MD3Colors.neutral20}
-                          icon="close"
-                          iconColor={MD3Colors.error50}
-                          size={30}
-                          onPress={() => bottomSheetRef.current.close()}
-                        />
-                        <Text style={{fontSize: 20}}>Добавить новую цель</Text>
-                        <IconButton
-                          mode='contained'
-                          containerColor={MD3Colors.neutral20}
-                          icon="plus"
-                          iconColor={MD3Colors.tertiary100}
-                          size={30}
-                          onPress={() => console.log('Pressed')}
-                        />
-                    </View>
+
                     <AddForm />
                 </BottomSheet>
             </Portal>
@@ -78,12 +60,6 @@ const styles = StyleSheet.create({
         bottom: 0,
         //backgroundColor: 'rgba(255,255,255,.1)',
         width: '100%',
-    },
-    header: {
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between"
     },
     left: {
         width: '45%',
