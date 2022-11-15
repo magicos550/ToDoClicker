@@ -10,6 +10,7 @@ import {useDispatch, useSelector} from "react-redux";
 interface iCardInfo {
     ID: number,
     Title: string,
+    Score: number,
     Step: number,
     Target: number,
     Color: string
@@ -46,7 +47,7 @@ const Content = () => {
         <View>
             <ScrollView contentContainerStyle={styles.view} style={{backgroundColor: colors.background, height: '100%'}}>
                 {cards && Object.keys(cards).length !== 0 ? Object.keys(cards).map((item) => (
-                    <Card key={cards[item].ID} id={cards[item].ID} color={cards[item].Color} title={cards[item].Title} step={cards[item].Step} target={cards[item].Target} />
+                    <Card key={cards[item].ID} id={cards[item].ID} score={cards[item].Score} color={cards[item].Color} title={cards[item].Title} step={cards[item].Step} target={cards[item].Target} />
                 )) : <Text>EMPTY</Text>}
             </ScrollView>
         </View>

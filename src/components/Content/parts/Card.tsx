@@ -5,11 +5,13 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import {useDispatch} from "react-redux";
 import {db} from "../../../db";
 import {removeCard} from "../../../store/slices/cardsSlice";
+import {useBottomSheet} from "@gorhom/bottom-sheet";
 
 interface iCardConfig {
     id: number
     color: string,
     title: string,
+    score: number,
     step: number,
     target: number
 }
@@ -71,9 +73,21 @@ const Card = (props: iCardConfig) => {
         }
     })
 
-    let [score , setScore] = useState(0);
+    let [score , setScore] = useState(props.score);
 
     const percent = (score / props.target) * 100;
+
+    const addScore = async () => {
+        await db.transaction((tx) => {
+            tx.executeSql(
+                `update todos set score=? where ID=?`,
+                [score + props.step, props.id],
+                (transaction, result) => {
+                    setScore(score += props.step)
+                }
+            )
+        });
+    }
 
     const complete = () => {
         db.transaction((tx) => {
@@ -85,6 +99,33 @@ const Card = (props: iCardConfig) => {
                 }
             )
         });
+    }
+
+    const intToString = (num: number) => {
+        const numString: string = num.toString();
+
+        numString.replace(/[^0-9.]/g, '');
+
+        if (num < 1000) {
+            return num.toString();
+        }
+
+        let si = [
+            {v: 1E3, s: "K"},
+            {v: 1E6, s: "M"},
+            {v: 1E9, s: "B"},
+            {v: 1E12, s: "T"},
+            {v: 1E15, s: "P"},
+            {v: 1E18, s: "E"}
+        ];
+        let index;
+
+        for (index = si.length - 1; index > 0; index--) {
+            if (num >= si[index].v) {
+                break;
+            }
+        }
+        return (num / si[index].v).toFixed(2).replace(/\.0+$|(\.[0-9]*[1-9])0+$/, "$1") + si[index].s;
     }
 
 
@@ -109,22 +150,19 @@ const Card = (props: iCardConfig) => {
                     <View>
                         <View style={styles.textWrapper}>
                             <Text style={styles.text}>Счетчик:</Text>
-                            <Text style={styles.text}>{props.target >= score ? score + '/' + props.target : props.target}</Text>
+                            <Text style={styles.text}>{props.target >= score ? intToString(score) + '/' + intToString(props.target) : intToString(props.target)}</Text>
                         </View>
                         <View style={[styles.textWrapper, {marginTop: 10}]}>
                             <Text style={styles.text}>Осталось:</Text>
-                            <Text style={styles.text}>{props.target > score ? props.target - score : 'OK'}</Text>
+                            <Text style={styles.text}>{props.target > score ? intToString(props.target - score) : 'OK'}</Text>
                         </View>
                     </View>
 
-                    <Button mode="contained" labelStyle={{fontSize: 16, fontWeight: 'bold'}} textColor={MD3Colors.neutral100} onPress={() => setScore(score += props.step)} style={styles.cardButton}>
-                        + {props.step}
+                    <Button mode="contained" labelStyle={{fontSize: 16, fontWeight: 'bold'}} textColor={MD3Colors.neutral100} onPress={() => addScore()} style={styles.cardButton}>
+                        + {intToString(props.step)}
                     </Button>
                 </View>
             </View>
-            {/*<Button mode="outlined" color={props.color} onPress={() => setScore(0)} style={styles.cardButton}>
-                Сброс
-            </Button>*/}
         </View>
     )
 };

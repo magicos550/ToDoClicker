@@ -1,6 +1,6 @@
 import * as React from "react";
 import {StyleSheet, View} from "react-native";
-import {IconButton, MD3Colors, Text} from "react-native-paper";
+import {IconButton, MD3Colors, Text, useTheme} from "react-native-paper";
 
 interface iColorPickerProps {
     currentColor: string,
@@ -10,8 +10,15 @@ interface iColorPickerProps {
     updateColor: (color: string) => void
 }
 
-const ColorPicker = (props: iColorPickerProps) => {
+const getContrastYIQ = hc => {
+    const [r, g, b] = hc.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
+        ,(m, r, g, b) => '#' + r + r + g + g + b + b)
+        .substring(1).match(/.{2}/g)
+        .map(x => parseInt(x, 16));
+    return ((r * 299) + (g * 587) + (b * 114)) / 1000 >= 128;
+}
 
+const ColorPicker = (props: iColorPickerProps) => {
     const styles = StyleSheet.create({
         colorPickerWrapper: {
             display: "flex",
@@ -36,7 +43,7 @@ const ColorPicker = (props: iColorPickerProps) => {
             marginVertical: 5
         },
         check: {
-            alignSelf: "center"
+            alignSelf: "center",
         },
         colorPickerBox: {
             padding: 5,
@@ -53,10 +60,11 @@ const ColorPicker = (props: iColorPickerProps) => {
                 {Object.keys(props.colors).map((item) => (
                     <IconButton
                         key={item}
+                        containerColor={props.colors[item]}
                         icon={props.currentColor === props.colors[item] ? 'check' : ''}
-                        iconColor={MD3Colors.primary0}
+                        iconColor={getContrastYIQ(props.colors[item]) ? 'black' : 'white'}
                         size={40}
-                        style={[styles.colorPickerItem, {backgroundColor: props.colors[item]}]}
+                        style={[styles.colorPickerItem]}
                         onPress={() => {
                             props.updateColor(props.colors[item]);
                         }}

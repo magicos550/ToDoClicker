@@ -33,10 +33,6 @@ const AddForm = (props) => {
     }
 
     const addNewCard = () => {
-        const newCard = {
-
-        }
-
         db.transaction((tx) => {
             tx.executeSql(
                 `insert into todos (title, target, score, step, color) values (?, ?, ?, ?, ?)`,
@@ -61,6 +57,8 @@ const AddForm = (props) => {
         setInfo(initialState);
         close();
     }
+
+    const stepLessTarget = (val: string) => (parseInt(val) <= info.target) ? parseInt(val.replace(/[^0-9]/g, '')) : info.target
 
 
     const styles = StyleSheet.create({
@@ -152,7 +150,7 @@ const AddForm = (props) => {
                             keyboardType={'numeric'}
                             value={info.target ? info.target.toString() : ''}
                             selectionColor={info.color}
-                            onChangeText={val => setInfo({...info, target: parseInt(val.replace(/[^0-9]/g, ''))})}
+                            onChangeText={val => setInfo({...info, target: parseInt(val.replace(/[^0-9]/g, '')), step: info.step ? stepLessTarget(info.step.toString()) : 0})}
                         />
                     </View>
                     <View>
@@ -164,9 +162,9 @@ const AddForm = (props) => {
                             style={[styles.textInputSmall , styles.textInput]}
                             //label="Шаг"
                             keyboardType={'numeric'}
-                            value={info.step ? info.step.toString() : ''}
+                            value={info.step && info.target ? info.step <= info.target ? info.step.toString() : info.target.toString() : ''}
                             selectionColor={info.color || '#ffffff'}
-                            onChangeText={val => setInfo({...info, step: parseInt(val.replace(/[^0-9]/g, ''))})}
+                            onChangeText={val => setInfo({...info, step: stepLessTarget(val)})}
                         />
                     </View>
                 </View>
