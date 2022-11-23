@@ -1,14 +1,17 @@
 import {createSlice} from "@reduxjs/toolkit";
 
 interface iCard {
-    [key: number]:  {
-        ID: number | null,
-        title: string | null,
-        target: number | null,
-        step: number | null,
-        color: string | null,
-        score: number | null,
-    }
+    ID: number | null,
+    title: string | null,
+    target: number | null,
+    step: number | null,
+    color: string | null,
+    score: number | null,
+}
+
+interface iAddCardInterface {
+    payload: iCard[],
+    type: string
 }
 
 const initialState = {}
@@ -18,7 +21,7 @@ const cardsSlice = createSlice({
     name: 'cards',
     initialState,
     reducers: {
-        addCard(state, action) {
+        addCard(state, action: iAddCardInterface) {
             let newState = {}
             action.payload.map((item) => newState[item.ID] = {...item});
 
@@ -28,15 +31,13 @@ const cardsSlice = createSlice({
             state[action.payload.ID] = {...state[action.payload.ID], ...action.payload}
         },
         removeCard(state, action) {
-            const newState = Object.keys(state).filter(key =>
+            return Object.keys(state).filter(key =>
                 key !== action.payload.toString()).reduce((obj, key) =>
                 {
                     obj[key] = state[key];
                     return obj;
                 }, {}
             );
-
-            return newState;
         },
     }
 })

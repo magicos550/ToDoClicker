@@ -5,7 +5,7 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import {useDispatch} from "react-redux";
 import {db} from "../../../db";
 import {removeCard} from "../../../store/slices/cardsSlice";
-import BottomSheet, {useBottomSheet} from "@gorhom/bottom-sheet";
+import BottomSheet from "@gorhom/bottom-sheet";
 import AddForm from "./AddForm";
 
 interface iCardConfig {
@@ -23,7 +23,7 @@ const Card = (props: iCardConfig) => {
     const bottomSheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ['100%'], []);
 
-    const handleSheetChanges = useCallback((index: number) => {
+    const handleSheetChanges = useCallback(() => {
         Keyboard.dismiss();
     }, []);
 
@@ -90,7 +90,7 @@ const Card = (props: iCardConfig) => {
             tx.executeSql(
                 `update todos set score=? where ID=?`,
                 [score + props.step, props.id],
-                (transaction, result) => {
+                () => {
                     setScore(score += props.step)
                 }
             )
@@ -102,7 +102,7 @@ const Card = (props: iCardConfig) => {
             tx.executeSql(
                 `delete from todos where ID=${props.id}`,
                 null,
-                (transaction, result) => {
+                () => {
                     dispatch(removeCard(props.id))
                 }
             )
