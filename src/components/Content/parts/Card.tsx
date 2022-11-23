@@ -1,11 +1,12 @@
-import React, {useState} from 'react';
-import {Button, MD3Colors, Text} from 'react-native-paper';
-import {StyleSheet, View} from "react-native";
+import React, {useCallback, useMemo, useRef, useState} from 'react';
+import {Button, MD3Colors, Portal, Text} from 'react-native-paper';
+import {Keyboard, StyleSheet, TouchableOpacity, View} from "react-native";
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import {useDispatch} from "react-redux";
 import {db} from "../../../db";
 import {removeCard} from "../../../store/slices/cardsSlice";
-import {useBottomSheet} from "@gorhom/bottom-sheet";
+import BottomSheet, {useBottomSheet} from "@gorhom/bottom-sheet";
+import AddForm from "./AddForm";
 
 interface iCardConfig {
     id: number
@@ -18,6 +19,13 @@ interface iCardConfig {
 
 const Card = (props: iCardConfig) => {
     const dispatch = useDispatch();
+
+    const bottomSheetRef = useRef<BottomSheet>(null);
+    const snapPoints = useMemo(() => ['100%'], []);
+
+    const handleSheetChanges = useCallback((index: number) => {
+        Keyboard.dismiss();
+    }, []);
 
     const styles = StyleSheet.create({
         card: {
@@ -130,7 +138,7 @@ const Card = (props: iCardConfig) => {
 
 
     return (
-        <View style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => bottomSheetRef.current.snapToIndex(0)}>
             <Text style={styles.cardTitle}>{props.title}</Text>
             <View style={styles.cardInner}>
                 <View style={styles.cardProgress}>
@@ -163,7 +171,21 @@ const Card = (props: iCardConfig) => {
                     </Button>
                 </View>
             </View>
-        </View>
+            <Portal>
+                <BottomSheet
+                  ref={bottomSheetRef}
+                  index={-1}
+                  snapPoints={snapPoints}
+                  onChange={handleSheetChanges}
+                  enablePanDownToClose={true}
+                  enableHandlePanningGesture={false}
+                  backgroundStyle={{backgroundColor: '#282828'}}
+                >
+
+                    <AddForm cardInfo={{title: props.title, step: props.step, target: props.target, color: props.color}} cardId={props.id}/>
+                </BottomSheet>
+            </Portal>
+        </TouchableOpacity>
     )
 };
 

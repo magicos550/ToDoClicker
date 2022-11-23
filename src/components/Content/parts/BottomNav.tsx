@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {Keyboard, Platform, StyleSheet, View} from "react-native";
-import {FAB, IconButton, MD3Colors, Portal, Text, useTheme} from 'react-native-paper';
+import {Keyboard, StyleSheet, View} from "react-native";
+import {FAB, MD3Colors, Portal, useTheme} from 'react-native-paper';
 import BottomSheet from '@gorhom/bottom-sheet';
 import {useCallback, useMemo, useRef} from "react";
 import AddForm from "./AddForm";

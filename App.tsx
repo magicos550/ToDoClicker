@@ -1,7 +1,6 @@
 import React, {useEffect} from "react";
-import {StyleSheet, StatusBar} from 'react-native';
+import {StyleSheet, SafeAreaView} from 'react-native';
 import {useTheme} from "react-native-paper";
-import {SafeAreaView, SafeAreaProvider} from "react-native-safe-area-context";
 import Index from "./src/Index";
 import {GestureHandlerRootView} from "react-native-gesture-handler";
 import {createTable} from './src/db';
@@ -13,11 +12,11 @@ const App: React.FC = () => {
     const {colors} = useTheme();
 
     return (
-        <SafeAreaProvider style={[styles.container, {backgroundColor: colors.background}]}>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <Index />
-          </GestureHandlerRootView>
-        </SafeAreaProvider>
+      <SafeAreaView style={[styles.container, {backgroundColor: colors.background}]}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <Index />
+        </GestureHandlerRootView>
+      </SafeAreaView>
     );
 }
 

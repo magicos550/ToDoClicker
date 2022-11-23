@@ -1,19 +1,19 @@
 import * as React from 'react';
-import {Appbar, useTheme, Text} from 'react-native-paper';
+import {useTheme, Text} from 'react-native-paper';
 import {ScrollView, StyleSheet, View} from "react-native";
 import Card from "./parts/Card";
 import {db} from "../../db";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {addCard} from "../../store/slices/cardsSlice";
 import {useDispatch, useSelector} from "react-redux";
 
 interface iCardInfo {
     ID: number,
-    Title: string,
-    Score: number,
-    Step: number,
-    Target: number,
-    Color: string
+    title: string,
+    score: number,
+    step: number,
+    target: number,
+    color: string
 }
 
 interface iCardsState {
@@ -24,7 +24,6 @@ interface iCardsState {
 
 const Content = () => {
     const {colors} = useTheme();
-    const [items, setItems] = useState<iCardInfo[]>(null);
     const dispatch = useDispatch();
     const cards = useSelector((state:iCardsState) => state.cards)
 
@@ -36,7 +35,6 @@ const Content = () => {
                 `SELECT * FROM todos`,
                 [],
                 (_, { rows: { _array } }) => {
-                    setItems(_array)
                     dispatch(addCard(_array));
                 }
             )
@@ -47,7 +45,7 @@ const Content = () => {
         <View>
             <ScrollView contentContainerStyle={styles.view} style={{backgroundColor: colors.background, height: '100%'}}>
                 {cards && Object.keys(cards).length !== 0 ? Object.keys(cards).map((item) => (
-                    <Card key={cards[item].ID} id={cards[item].ID} score={cards[item].Score} color={cards[item].Color} title={cards[item].Title} step={cards[item].Step} target={cards[item].Target} />
+                  <Card key={cards[item].ID} id={cards[item].ID} score={cards[item].score} color={cards[item].color} title={cards[item].title} step={cards[item].step} target={cards[item].target} />
                 )) : <Text>EMPTY</Text>}
             </ScrollView>
         </View>

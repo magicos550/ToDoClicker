@@ -3,11 +3,11 @@ import {createSlice} from "@reduxjs/toolkit";
 interface iCard {
     [key: number]:  {
         ID: number | null,
-        Title: string | null,
-        Target: number | null,
-        Step: number | null,
-        Color: string | null,
-        Score: number | null,
+        title: string | null,
+        target: number | null,
+        step: number | null,
+        color: string | null,
+        score: number | null,
     }
 }
 
@@ -20,10 +20,12 @@ const cardsSlice = createSlice({
     reducers: {
         addCard(state, action) {
             let newState = {}
-            action.payload.map((item) => {
-                return newState[item.ID] = {...item}
-            })
+            action.payload.map((item) => newState[item.ID] = {...item});
+
             return {...state , ...newState}
+        },
+        editCard(state, action) {
+            state[action.payload.ID] = {...state[action.payload.ID], ...action.payload}
         },
         removeCard(state, action) {
             const newState = Object.keys(state).filter(key =>
@@ -35,10 +37,10 @@ const cardsSlice = createSlice({
             );
 
             return newState;
-        }
+        },
     }
 })
 
-export const {addCard, removeCard} = cardsSlice.actions;
+export const {addCard, editCard, removeCard} = cardsSlice.actions;
 
 export default cardsSlice.reducer;
