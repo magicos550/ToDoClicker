@@ -1,9 +1,7 @@
-import React from "react";
-import {MD3DarkTheme, Provider as PaperProvider} from "react-native-paper";
+import {MD3DarkTheme, Provider as PaperProvider, Text} from "react-native-paper";
 import BottomNav from "./components/Content/parts/BottomNav";
 import Content from "./components/Content/Content";
-import {Provider as ReduxProvider} from "react-redux";
-import {store} from './store/index'
+
 
 
 const theme = {
@@ -18,13 +16,13 @@ const theme = {
 
 const Index: React.FC = () => {
     return (
-        <ReduxProvider store={store}>
-            <PaperProvider theme={theme}>
-                <Content />
-                <BottomNav />
-            </PaperProvider>
-        </ReduxProvider>
+        /*<ReduxProvider store={store}>
 
+        </ReduxProvider>*/
+        <>
+          <Content />
+          <BottomNav />
+        </>
     );
 }
 

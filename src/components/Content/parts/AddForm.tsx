@@ -1,13 +1,22 @@
 import * as React from 'react';
 import {ScrollView, StatusBar, StyleSheet, View} from "react-native";
-import {Divider, HelperText, IconButton, MD3Colors, Portal, Snackbar, Text, TextInput} from 'react-native-paper';
+import {
+    Button,
+    Divider,
+    HelperText,
+    IconButton,
+    MD3Colors,
+    Portal,
+    Snackbar,
+    Text,
+    TextInput
+} from 'react-native-paper';
 import {colorsList} from "../../../colorsConfig";
 import ColorPicker from "./ColorPicker";
 import {useBottomSheet} from "@gorhom/bottom-sheet";
 import {db} from "../../../db";
-import {addCard, editCard} from "../../../store/slices/cardsSlice";
+import {addCard, editCard, removeCard} from "../../../store/slices/cardsSlice";
 import {useDispatch} from "react-redux";
-import card from "./Card";
 
 interface iToDo {
     title: string | null,
@@ -43,34 +52,38 @@ const AddForm = ({cardInfo, cardId}: iProps) => {
 
     const onDismissSnackBar = () => setVisible(false);
 
-    const addNewCard = async () => {
-        if([...Object.values(info)].every(e => e)) {
-            await db.transaction((tx) => {
-                tx.executeSql(
-                  `insert into todos (title, target, score, step, color) values (?, ?, ?, ?, ?)`,
-                  [info.title , info.target, 0, info.step, info.color],
-                  (transaction, result) => {
-                      dispatch(addCard(
-                        [
-                            {
-                                "ID": result.insertId,
-                                "title": info.title,
-                                "target": info.target,
-                                "score": 0,
-                                "step": info.step,
-                                "color": info.color
-                            }
-                        ]
-                      ));
-                  }
-                )
-            });
-            //
-            setInfo(initialState);
+    const checkForm = async (id?: number) => {
+        if([...Object.values(info)].every(e => e) && info.target >= info.step) {
+            id ? await editCurrentCard(id): await addNewCard();
+            //setInfo(initialState);
             close();
         } else {
             setVisible(true);
         }
+    }
+
+    const addNewCard = async () => {
+        await db.transaction((tx) => {
+            tx.executeSql(
+              `insert into todos (title, target, score, step, color) values (?, ?, ?, ?, ?)`,
+              [info.title , info.target, 0, info.step, info.color],
+              (transaction, result) => {
+                  dispatch(addCard(
+                    [
+                        {
+                            "ID": result.insertId,
+                            "title": info.title,
+                            "target": info.target,
+                            "score": 0,
+                            "step": info.step,
+                            "color": info.color
+                        }
+                    ]
+                  ));
+              }
+            )
+        });
+        setInfo(initialState);
     }
 
     const editCurrentCard = async (id: number) => {
@@ -87,68 +100,33 @@ const AddForm = ({cardInfo, cardId}: iProps) => {
                           "step": info.step,
                           "color": info.color
                       }))
-                      close();
                   }
                 )
             });
-            //
             close();
         } else {
             setVisible(true);
         }
     }
 
-    const stepLessTarget = (val: string) => (parseInt(val) <= info.target) ? parseInt(val.replace(/[^0-9]/g, '')) : info.target
+    const resetCard = (): void => setInfo(initialState);
 
-
-    const styles = StyleSheet.create({
-        container: {
-            paddingHorizontal: 5,
-        },
-        wrapper: {
-            paddingHorizontal: 10
-        },
-        header: {
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-        },
-        content: {
-            paddingTop: StatusBar.currentHeight
-        },
-        textInput: {
-            backgroundColor: '#323232',
-            marginBottom: 20,
-            marginTop: 0
-        },
-        textInputSmall: {
-            width: 150,
-        },
-        label: {
-            fontSize: 18
-        },
-        divider: {
-            backgroundColor: '#030303',
-            marginBottom: 10,
-            marginTop: 5
-        },
-        inputSet: {
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginTop: 10
-        },
-        helperText: {
-            marginTop: -20
-        }
-    });
-
-
+    const deleteCard = (id: number): void => {
+        db.transaction((tx) => {
+            tx.executeSql(
+              `delete from todos where ID=${id}`,
+              null,
+              async () => {
+                  await dispatch(removeCard(id));
+              }
+            )
+        });
+        close();
+    }
 
     return (
-        <ScrollView style={[styles.container, styles.wrapper]}>
+        <View style={[styles.container, styles.wrapper]}>
+            <Text>{JSON.stringify(cardInfo)}</Text>
             <View style={styles.header}>
                 <IconButton
                     mode='contained'
@@ -165,7 +143,7 @@ const AddForm = ({cardInfo, cardId}: iProps) => {
                     icon={cardInfo ? "check" : "plus"}
                     iconColor='#9ebd79'
                     size={27}
-                    onPress={() => cardInfo ? editCurrentCard(cardId) : addNewCard()/*info.color ? addNewCard() : false*/}
+                    onPress={() => cardInfo ? checkForm(cardId) : checkForm()}
                 />
             </View>
             <Divider style={styles.divider} />
@@ -199,7 +177,7 @@ const AddForm = ({cardInfo, cardId}: iProps) => {
                             keyboardType={'numeric'}
                             value={info.target ? info.target.toString() : ''}
                             selectionColor={info.color}
-                            onChangeText={val => setInfo({...info, target: parseInt(val.replace(/[^0-9]/g, '')), step: info.step ? stepLessTarget(info.step.toString()) : 0})}
+                            onChangeText={val => setInfo({...info, target: parseInt(val)})}
                         />
                         <HelperText style={styles.helperText} type="error" visible={!info.target}>
                             Заполните количество
@@ -214,12 +192,15 @@ const AddForm = ({cardInfo, cardId}: iProps) => {
                             style={[styles.textInputSmall , styles.textInput]}
                             //label="Шаг"
                             keyboardType={'numeric'}
-                            value={info.step && info.target ? info.step <= info.target ? info.step.toString() : info.target.toString() : ''}
+                            value={info.step ? info.step.toString() : ''}
                             selectionColor={info.color || '#ffffff'}
-                            onChangeText={val => setInfo({...info, step: stepLessTarget(val)})}
+                            onChangeText={val => setInfo({...info, step: parseInt(val)})}
                         />
                         <HelperText style={styles.helperText} type="error" visible={!info.step}>
-                            Заполните Шаг
+                            Заполните шаг
+                        </HelperText>
+                        <HelperText style={styles.helperText} type="error" visible={info.step > info.target}>
+                            Шаг больше цели
                         </HelperText>
                     </View>
                 </View>
@@ -227,8 +208,14 @@ const AddForm = ({cardInfo, cardId}: iProps) => {
 
             <ColorPicker currentColor={info.color} updateColor={updateColor} colors={colorsList} />
             <HelperText type="error" visible={!info.color}>
-                Требуется выбрать цвет цели
+                Выберите цвет цели
             </HelperText>
+            {cardInfo ?
+              <Button mode={'contained-tonal'} labelStyle={styles.buttonContent} onPress={() => deleteCard(cardId)}>Удалить цель</Button>
+              :
+              <Button mode={'contained-tonal'} labelStyle={styles.buttonContent} onPress={() => resetCard()}>Сбросить</Button>
+            }
+
             <Portal>
                 <Snackbar
                   visible={visible}
@@ -240,12 +227,59 @@ const AddForm = ({cardInfo, cardId}: iProps) => {
                           setVisible(false);
                       },
                   }}>
-                    Требуется заполнить все поля.
+                    {info.target < info.step ? 'Шаг больше цели' : 'Вы не заполнили все поля.'}
                 </Snackbar>
             </Portal>
-
-        </ScrollView>
+        </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        paddingHorizontal: 5,
+    },
+    wrapper: {
+        paddingHorizontal: 10
+    },
+    header: {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+    },
+    content: {
+        paddingTop: StatusBar.currentHeight
+    },
+    textInput: {
+        backgroundColor: '#323232',
+        marginBottom: 20,
+        marginTop: 0
+    },
+    textInputSmall: {
+        width: 150,
+    },
+    label: {
+        fontSize: 18
+    },
+    divider: {
+        backgroundColor: '#030303',
+        marginBottom: 10,
+        marginTop: 5
+    },
+    inputSet: {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginTop: 10
+    },
+    helperText: {
+        marginTop: -20,
+        paddingLeft: 0
+    },
+    buttonContent: {
+        fontSize: 18,
+    }
+});
 
 export default AddForm;

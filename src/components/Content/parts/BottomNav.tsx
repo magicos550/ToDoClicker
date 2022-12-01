@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
         bottom: -5,
         borderTopRightRadius: 30,
         position: 'absolute',
-        backgroundColor: 'rgba(255,255,255,.1)',
+        backgroundColor: MD3Colors.neutral30,
         transform: [
             {scaleY: .5},
         ],
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
         right: 0,
         borderTopLeftRadius: 30,
         position: 'absolute',
-        backgroundColor: 'rgba(255,255,255,.1)',
+        backgroundColor: MD3Colors.neutral30,
         transform: [
             {scaleY: .5},
         ],

@@ -3,7 +3,7 @@ import {useTheme, Text} from 'react-native-paper';
 import {ScrollView, StyleSheet, View} from "react-native";
 import Card from "./parts/Card";
 import {db} from "../../db";
-import {useEffect} from "react";
+import {useEffect, useMemo} from "react";
 import {addCard} from "../../store/slices/cardsSlice";
 import {useDispatch, useSelector} from "react-redux";
 
@@ -27,9 +27,18 @@ const Content = () => {
     const dispatch = useDispatch();
     const cards = useSelector((state:iCardsState) => state.cards)
 
+    const cardsList = () => useMemo((): JSX.Element => {
+      return (
+        <ScrollView contentContainerStyle={styles.view} style={{backgroundColor: colors.background, height: '100%'}}>
+            {cards && Object.keys(cards).length !== 0 ? Object.keys(cards).map((item) => (
+              <Card key={cards[item].ID} cardInfo={cards[item]} />
+            )) : false}
+        </ScrollView>
+      )
+    } , [cards])
+
     useEffect(() => {
         db.transaction((tx) => {
-            //tx.executeSql("insert into todos (title, target, score, step, color) values (?, ?, ?, ?, ?)", ['TEST' , 200, 0, 10, '#00E5FF']);
             //tx.executeSql("delete from todos");
             tx.executeSql(
                 `SELECT * FROM todos`,
@@ -43,11 +52,7 @@ const Content = () => {
 
     return (
         <View>
-            <ScrollView contentContainerStyle={styles.view} style={{backgroundColor: colors.background, height: '100%'}}>
-                {cards && Object.keys(cards).length !== 0 ? Object.keys(cards).map((item) => (
-                  <Card key={cards[item].ID} id={cards[item].ID} score={cards[item].score} color={cards[item].color} title={cards[item].title} step={cards[item].step} target={cards[item].target} />
-                )) : <Text>EMPTY</Text>}
-            </ScrollView>
+            {cardsList()}
         </View>
     )
 };
@@ -56,7 +61,7 @@ const styles = StyleSheet.create({
     view: {
         paddingHorizontal: 15,
         paddingTop: 15,
-        paddingBottom: 50
+        paddingBottom: 50,
     }
 })
 
